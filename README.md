@@ -26,8 +26,10 @@ measures whether the chain holds.
 
 **This is a prototype and a case study.** It is not a deployable
 system. It has never been connected to a real 311 line, a real case
-management system, or a real tow yard. See "Known limitations" for the
-specific things that would have to change first.
+management system, or a real tow yard. It was built and written up by
+one person with AI coding assistants; where this document says "we," it
+means the author and the tools used to build it, not a team. See "Known
+limitations" for the specific things that would have to change first.
 
 ## What we cut, and why
 
