@@ -31,6 +31,16 @@ one person with AI coding assistants; where this document says "we," it
 means the author and the tools used to build it, not a team. See "Known
 limitations" for the specific things that would have to change first.
 
+**No affiliation or endorsement.** The City of Charlotte and the
+Charlotte-Mecklenburg Police Department are named because the call-line
+problem this prototype addresses is theirs, and because the published
+service volumes quoted below come from the city's own budget and
+procurement records. Neither the city nor CMPD is involved in this
+project, has reviewed it, or endorsed it. The 311 line's public
+non-emergency number is deliberately not published here. Nothing in this
+repository is production code for any city, and the system described has
+never processed a real call from anyone.
+
 ## What we cut, and why
 
 Every cut below is a scope decision, not an omission. The full list
@@ -408,6 +418,15 @@ addresses outside the reserved example domains.
 not be deployed without the city's own review of the escalation
 policy, the recording policy, and the retention policy, and without an
 independent safety evaluation.
+
+**No city affiliation or endorsement.** The City of Charlotte and
+Charlotte-Mecklenburg Police Department are named for attribution, not
+implication. Neither is involved in this project, has reviewed it, or
+endorses it, and the published non-emergency line number is deliberately
+omitted. Anyone reading this should assume the same posture toward the
+municipal CRM case study in the portfolio: these are independent
+prototypes about problems the author has worked on, not products the
+relevant governments have adopted or reviewed.
 
 ## License
 
