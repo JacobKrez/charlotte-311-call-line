@@ -1,0 +1,73 @@
+# CI for the 311 call line.
+#
+# What this workflow guards:
+#   1. The full pytest suite (guardrails, slots, dialogue, PII) must
+#      pass with no provider API keys present. The suite is offline
+#      by construction, so a green run means the safety-critical
+#      paths behave identically on every machine.
+#   2. The red-team corpus must meet its per-category thresholds:
+#      emergency, injection, and scope at 100%, false_positive at
+#      95%. The harness is deterministic and makes no model calls.
+#   3. The quality gate (scripts/gate.py + QUALITY_BAR.md) runs as
+#      the final step, so the entire bar is enforced in CI: no
+#      secrets, no personal data, guardrail ordering asserted, no
+#      writes before confirmation, required files present, no absolute
+#      developer paths. A red gate blocks the build.
+#
+# A red gate blocks the build. Nothing ships past it.
+
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install pinned dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pytest suite
+        run: pytest -q
+
+      - name: Red-team threshold gate (no LLM calls)
+        run: |
+          set +e
+          python3 redteam/run_redteam.py > redteam.log 2>&1
+          status=$?
+          set -e
+          cat redteam.log
+          if [ $status -ne 0 ]; then
+            echo "::error::red-team thresholds failed with status $status"
+            exit $status
+          fi
+          if grep -q "Traceback" redteam.log; then
+            echo "::error::red-team run produced a Python traceback"
+            exit 1
+          fi
+
+      - name: Quality gate (final step; see QUALITY_BAR.md)
+        run: |
+          set +e
+          python3 scripts/gate.py > gate.log 2>&1
+          status=$?
+          set -e
+          cat gate.log
+          if [ $status -ne 0 ]; then
+            echo "::error::quality gate failed with status $status"
+            exit $status
+          fi
+          if grep -q "Traceback" gate.log; then
+            echo "::error::quality gate produced a Python traceback"
+            exit 1
+          fi

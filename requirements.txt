@@ -1,0 +1,14 @@
+# The offline path -- tests, red-team corpus, quality gate, demo --
+# needs only pytest. Everything else is optional and is only needed
+# to talk to a real speech provider or a real text-to-speech service.
+#
+# Pin these so a CI run in six months reproduces the run today.
+pytest==9.1.1
+
+# --- Optional: real speech-to-text and text-to-speech ---
+# The provider implementation in src/audio.py accepts an
+# already-configured client, so these are only needed if you wire one
+# up yourself.
+# deepgram-sdk>=3.0.0
+# gtts>=2.5.0
+# pyaudio>=0.2.14
