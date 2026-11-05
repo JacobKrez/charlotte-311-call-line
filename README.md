@@ -366,6 +366,8 @@ Ordered by what blocks the next step, not by what is most fun.
 │   ├── test_dialog.py      The dialogue, including the confirmation
 │   │                       integrity property.
 │   ├── test_emergency.py   Triage: what fires, what must not.
+│   ├── test_gate_scope.py  The gate scans tracked files, not a
+│   │                       reader's venv.
 │   ├── test_guardrail_order.py
 │   ├── test_injection_scope.py
 │   ├── test_pii.py

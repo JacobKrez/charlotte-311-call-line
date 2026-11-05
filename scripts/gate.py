@@ -312,19 +312,41 @@ def gate_g8_no_absolute_paths() -> tuple[bool, str]:
 def _tracked_files() -> list[Path]:
     """Every file the gate should inspect.
 
-    Text files only. Binary files are skipped by extension, and hidden
-    directories like .git are excluded.
+    In a git checkout this is ``git ls-files``: the files that are
+    published. A virtual environment or scratch directory the reader
+    creates is untracked and never scanned, whatever it is called. In a
+    source archive with no ``.git``, walk the tree and skip cache
+    directories and any directory holding a ``pyvenv.cfg``. Binary files
+    are skipped by extension either way.
     """
     skip_dirs = {".git", "__pycache__", ".pytest_cache", ".venv", "venv", "node_modules"}
     skip_suffixes = {
         ".pyc", ".png", ".jpg", ".jpeg", ".gif", ".wav", ".mp3", ".pdf",
         ".zip", ".gz", ".db", ".sqlite",
     }
+    candidates: list[Path] | None = None
+    if (REPO_ROOT / ".git").exists():
+        try:
+            listed = subprocess.run(
+                ["git", "ls-files", "-z"],
+                cwd=REPO_ROOT,
+                capture_output=True,
+                check=True,
+            ).stdout.decode("utf-8")
+            candidates = [REPO_ROOT / name for name in listed.split("\0") if name]
+        except (OSError, subprocess.CalledProcessError):
+            candidates = None
+    if candidates is None:
+        venvs = [cfg.parent for cfg in REPO_ROOT.rglob("pyvenv.cfg")]
+        candidates = [
+            path
+            for path in REPO_ROOT.rglob("*")
+            if not any(part in skip_dirs for part in path.relative_to(REPO_ROOT).parts)
+            and not any(venv in path.parents for venv in venvs)
+        ]
     files: list[Path] = []
-    for path in REPO_ROOT.rglob("*"):
+    for path in sorted(candidates):
         if not path.is_file():
-            continue
-        if any(part in skip_dirs for part in path.relative_to(REPO_ROOT).parts):
             continue
         if path.suffix.lower() in skip_suffixes:
             continue

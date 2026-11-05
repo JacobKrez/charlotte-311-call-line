@@ -93,7 +93,12 @@ of them move at runtime; the thresholds are fixed below.
 
 - **Threshold:** zero matches for private key headers, cloud access key
   patterns, live provider keys, or hardcoded password assignments.
-- **Source of truth:** a grep over every tracked file.
+- **Source of truth:** a grep over every tracked file. Tracked means
+  `git ls-files`, so a reader's virtual environment or scratch directory
+  is never scanned, whatever it is named (in a source archive with no
+  `.git`, any directory holding a `pyvenv.cfg` is skipped). An earlier
+  version walked the directory tree and went red on any venv not called
+  `.venv` or `venv`; `tests/test_gate_scope.py` is the regression test.
 - **Why this threshold:** this repository is public and is intended to
   be read by people outside the company. A committed key is
   immediately, irreversibly public. There is no partial credit and no
